@@ -4,10 +4,10 @@ Enterprise GenAI governance and orchestration gateway — multi-agent routing ac
 
 | | |
 |---|---|
-| **Local** | http://127.0.0.1:8000 |
-| **GitHub** | _(populated after `gh repo create`)_ |
-| **Vercel (UI)** | _(populated after deploy)_ |
-| **API** | Demo mode works without keys; set provider keys for live multi-cloud routing |
+| **GitHub** | https://github.com/satwikmed/SentinelAI |
+| **Vercel (UI)** | https://sentinelai-ochre-six.vercel.app |
+| **Local (UI+API)** | http://127.0.0.1:8000 |
+| **API for Vercel** | Proxied via `frontend/vercel.json` → localtunnel while your laptop runs the API (`npx localtunnel --port 8000`). For a permanent API, run `./scripts/deploy-fly.sh` and update the rewrite destination. |
 
 ---
 
