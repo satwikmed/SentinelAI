@@ -1,0 +1,38 @@
+FROM node:20-alpine AS webbuild
+WORKDIR /web
+COPY frontend/package.json ./
+RUN npm install
+COPY frontend/ ./
+ENV VITE_API_BASE=
+RUN npm run build
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential nginx \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt backend/requirements-nlp.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-nlp.txt \
+    && python -m spacy download en_core_web_sm || true
+
+COPY backend/app ./app
+COPY backend/data ./data
+COPY --from=webbuild /web/dist /usr/share/nginx/html
+COPY infra/docker/nginx.fly.conf /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/sites-enabled/default || true
+
+COPY infra/docker/start-all.sh /start-all.sh
+RUN chmod +x /start-all.sh
+
+ENV PYTHONUNBUFFERED=1
+ENV DOCS_DIR=./data/docs
+ENV CHROMA_PERSIST_DIR=/data/chroma
+ENV DATABASE_URL=sqlite+aiosqlite:////data/sentinelai.db
+ENV CORS_ORIGINS=*
+
+EXPOSE 8080
+
+CMD ["/start-all.sh"]

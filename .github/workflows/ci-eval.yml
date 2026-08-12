@@ -1,0 +1,61 @@
+name: CI Evaluation Gate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  eval-gate:
+    name: Faithfulness / Relevance Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run offline eval suite
+        run: python evals/run_eval.py --out eval-report.json
+
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval-report.json
+
+      - name: Fail deploy if gate failed
+        run: |
+          python - <<'PY'
+          import json, sys
+          report = json.load(open("eval-report.json"))
+          print(json.dumps(report, indent=2))
+          sys.exit(0 if report.get("gate_ok") else 1)
+          PY
+
+  backend-smoke:
+    name: Backend import smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: Import app
+        working-directory: backend
+        run: python -c "from app.main import app; print(app.title)"
+      - name: Pytest module suite
+        working-directory: backend
+        run: PYTHONPATH=. pytest tests/ -q --tb=line
+        env:
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          GOOGLE_API_KEY: ""

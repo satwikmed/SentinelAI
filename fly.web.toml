@@ -1,0 +1,24 @@
+# Fly.io configuration for SentinelAI frontend
+# Deploy from repo root after API is live:
+#   fly apps create sentinelai-web
+#   fly deploy -c fly.web.toml --build-arg VITE_API_BASE=https://sentinelai-gateway.fly.dev
+
+app = "sentinelai-web"
+primary_region = "iad"
+
+[build]
+  dockerfile = "infra/docker/Dockerfile.web"
+
+[build.args]
+  VITE_API_BASE = "https://sentinelai-gateway.fly.dev"
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

@@ -1,0 +1,38 @@
+# All-in-one Fly deploy (API + React UI)
+# fly apps create sentinelai
+# fly volumes create sentinelai_data --region iad --size 1
+# fly deploy -c fly.toml
+
+app = "sentinelai"
+primary_region = "iad"
+
+[build]
+  dockerfile = "infra/docker/Dockerfile.all"
+
+[env]
+  CORS_ORIGINS = "*"
+  DOCS_DIR = "./data/docs"
+  CHROMA_PERSIST_DIR = "/data/chroma"
+  DATABASE_URL = "sqlite+aiosqlite:////data/sentinelai.db"
+  ENVIRONMENT = "production"
+  DEBUG = "false"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 50
+    soft_limit = 25
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1024mb"
+
+[mounts]
+  source = "sentinelai_data"
+  destination = "/data"

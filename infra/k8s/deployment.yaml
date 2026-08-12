@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelai-api
+  labels:
+    app: sentinelai-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentinelai-api
+  template:
+    metadata:
+      labels:
+        app: sentinelai-api
+    spec:
+      containers:
+        - name: api
+          image: sentinelai-api:local
+          ports:
+            - containerPort: 8000
+          env:
+            - name: CORS_ORIGINS
+              value: "*"
+            - name: DATABASE_URL
+              value: sqlite+aiosqlite:///./sentinelai.db
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sentinelai-secrets
+                  key: openai_api_key
+                  optional: true
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sentinelai-secrets
+                  key: anthropic_api_key
+                  optional: true
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sentinelai-secrets
+                  key: google_api_key
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinelai-api
+spec:
+  selector:
+    app: sentinelai-api
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelai-web
+  labels:
+    app: sentinelai-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentinelai-web
+  template:
+    metadata:
+      labels:
+        app: sentinelai-web
+    spec:
+      containers:
+        - name: web
+          image: sentinelai-web:local
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinelai-web
+spec:
+  selector:
+    app: sentinelai-web
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
