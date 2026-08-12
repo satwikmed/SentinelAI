@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://polite-ends-follow.loca.lt/api/:path*"
+      "destination": "https://sentinelai-satwik.fly.dev/api/:path*"
     },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]

@@ -52,15 +52,24 @@ def _init_presidio() -> bool:
         return _presidio_analyzer is not None
     try:
         from presidio_analyzer import AnalyzerEngine
+        from presidio_analyzer.nlp_engine import NlpEngineProvider
         from presidio_anonymizer import AnonymizerEngine
 
-        _presidio_analyzer = AnalyzerEngine()
+        # Use the small model we bake into the image — never auto-download lg at runtime.
+        configuration = {
+            "nlp_engine_name": "spacy",
+            "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
+        }
+        provider = NlpEngineProvider(nlp_configuration=configuration)
+        nlp_engine = provider.create_engine()
+        _presidio_analyzer = AnalyzerEngine(nlp_engine=nlp_engine, supported_languages=["en"])
         _presidio_anonymizer = AnonymizerEngine()
         _presidio_ready = True
         return True
     except Exception:  # noqa: BLE001
         _presidio_ready = True
         _presidio_analyzer = None
+        _presidio_anonymizer = None
         return False
 
 

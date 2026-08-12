@@ -3,7 +3,7 @@
 set -euo pipefail
 export PATH="${HOME}/.fly/bin:${PATH}"
 
-APP_NAME="${FLY_APP_NAME:-sentinelai}"
+APP_NAME="${FLY_APP_NAME:-sentinelai-satwik}"
 REGION="${FLY_REGION:-iad}"
 
 if ! fly auth whoami >/dev/null 2>&1; then
@@ -11,11 +11,13 @@ if ! fly auth whoami >/dev/null 2>&1; then
   exit 1
 fi
 
-fly apps list | grep -q "${APP_NAME}" || fly apps create "${APP_NAME}"
+fly apps list --json 2>/dev/null | grep -q "\"Name\": \"${APP_NAME}\"" \
+  || fly apps list 2>/dev/null | grep -q "${APP_NAME}" \
+  || fly apps create "${APP_NAME}"
 
 # Volume for sqlite + chroma (ignore if exists)
 fly volumes list -a "${APP_NAME}" | grep -q sentinelai_data \
-  || fly volumes create sentinelai_data --region "${REGION}" --size 1 -a "${APP_NAME}"
+  || fly volumes create sentinelai_data --region "${REGION}" --size 1 -a "${APP_NAME}" --yes
 
 if [[ -n "${OPENAI_API_KEY:-}${ANTHROPIC_API_KEY:-}${GOOGLE_API_KEY:-}" ]]; then
   ARGS=()

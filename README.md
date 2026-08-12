@@ -5,9 +5,10 @@ Enterprise GenAI governance and orchestration gateway — multi-agent routing ac
 | | |
 |---|---|
 | **GitHub** | https://github.com/satwikmed/SentinelAI |
+| **Fly (API + UI, permanent)** | https://sentinelai-satwik.fly.dev |
 | **Vercel (UI)** | https://sentinelai-ochre-six.vercel.app |
+| **Actions (CI gate)** | https://github.com/satwikmed/SentinelAI/actions/runs/31558066220 |
 | **Local (UI+API)** | http://127.0.0.1:8000 |
-| **API for Vercel** | Proxied via `frontend/vercel.json` → localtunnel while your laptop runs the API (`npx localtunnel --port 8000`). For a permanent API, run `./scripts/deploy-fly.sh` and update the rewrite destination. |
 
 ---
 
