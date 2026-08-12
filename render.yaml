@@ -1,0 +1,31 @@
+# Render Blueprint — free tier, no credit card required
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: sentinelai-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./infra/docker/Dockerfile.api
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: DOCS_DIR
+        value: ./data/docs
+      - key: CHROMA_PERSIST_DIR
+        value: ./chroma_data
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./sentinelai.db
+      # Optional live providers — leave empty for demo/mock mode
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
