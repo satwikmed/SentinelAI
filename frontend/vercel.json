@@ -1,12 +1,12 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
   "rewrites": [
     {
       "source": "/api/:path*",
       "destination": "https://sentinelai-api-4q9q.onrender.com/api/:path*"
     },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
