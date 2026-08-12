@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://sentinelai-satwik.fly.dev/api/:path*"
+      "destination": "https://sentinelai-api-4q9q.onrender.com/api/:path*"
     },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]

@@ -5,10 +5,12 @@ Enterprise GenAI governance and orchestration gateway — multi-agent routing ac
 | | |
 |---|---|
 | **GitHub** | https://github.com/satwikmed/SentinelAI |
-| **Fly (API + UI, permanent)** | https://sentinelai-satwik.fly.dev |
-| **Vercel (UI)** | https://sentinelai-ochre-six.vercel.app |
-| **Actions (CI gate)** | https://github.com/satwikmed/SentinelAI/actions/runs/31558066220 |
+| **Render API (free, no card)** | https://sentinelai-api-4q9q.onrender.com |
+| **Vercel UI** | https://sentinelai-ochre-six.vercel.app |
+| **Actions (CI gate)** | https://github.com/satwikmed/SentinelAI/actions |
 | **Local (UI+API)** | http://127.0.0.1:8000 |
+
+> Render’s free tier sleeps after ~15 minutes idle. The first request after sleep can take 30–60s to wake; after that it’s normal. No credit card required.
 
 ---
 
@@ -122,20 +124,26 @@ gh auth login
 ./scripts/push-github.sh
 ```
 
+### Render (API — free, no credit card)
+Connect the GitHub repo as a Blueprint (`render.yaml`) or create a Docker web service.
+Live service: https://sentinelai-api-4q9q.onrender.com
+
+```bash
+# After code changes, push to main — auto-deploy is enabled
+git push origin main
+```
+
 ### Vercel (frontend)
-Point `VITE_API_BASE` at a public API origin (Fly / Railway / Render / tunnel):
+Point `vercel.json` rewrites at the Render API origin:
 
 ```bash
 cd frontend
-npx vercel login
-VITE_API_BASE=https://YOUR_API_ORIGIN npx vercel --prod --yes
+npx vercel --prod --yes
 ```
 
-### Fly.io (API + UI all-in-one)
-```bash
-fly auth login
-./scripts/deploy-fly.sh
-```
+### Fly.io (optional / legacy)
+Fly requires a card to keep machines awake beyond the trial window. Prefer Render for this project.
+`fly.toml` remains for reference only.
 
 ### Infra artifacts
 - Docker: `infra/docker/`
